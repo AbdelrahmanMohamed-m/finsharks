@@ -146,3 +146,4 @@ D:\finsharks\api\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkC
 D:\finsharks\api\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
 D:\finsharks\api\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
 D:\finsharks\api\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
+D:\finsharks\api\obj\Debug\net8.0\api.sourcelink.json

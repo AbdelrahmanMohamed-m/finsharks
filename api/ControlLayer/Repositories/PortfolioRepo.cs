@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.ControlLayer.Interfaces;
 using api.Data;
+using api.DataLayer.Dtos.CommentDto;
+using api.Dtos.StockDto;
 using api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +20,9 @@ namespace api.ControlLayer.Repositories
             _context = context;
         }
 
-        public async Task<List<Stock>> GetUserPortoflio(AppUser User)
+        public async Task<List<StockDto>> GetUserPortoflio(AppUser User)
         {
-            return await _context.Portfolios.Where(x => x.AppUserId == User.Id).Select(stock => new Stock
+            return await _context.Portfolios.Where(x => x.AppUserId == User.Id).Select(stock => new StockDto
             {
                 Id = stock.Stock.Id,
                 Symbol = stock.Stock.Symbol,
@@ -28,8 +30,15 @@ namespace api.ControlLayer.Repositories
                 Industry = stock.Stock.Industry,
                 Marektcap = stock.Stock.Marektcap,
                 CompanyName = stock.Stock.CompanyName,
-                Purshase = stock.Stock.Purshase,
-               
+                Purshase = stock.Stock.Purshase, 
+
+                Comments = stock.Stock.Comments.Select(comment => new CommentDto
+                {
+                    Id = comment.Id,
+                    Content = comment.Content,
+                    StockId = comment.StockId,
+                    CreatedBy = comment.AppUser.UserName,
+                }).ToList()
             }).ToListAsync();
         }
 
@@ -42,7 +51,7 @@ namespace api.ControlLayer.Repositories
 
         public async Task<Portfolio> DeletePortfolio(Portfolio portfolio)
         {
-             _context.Portfolios.Remove(portfolio);
+            _context.Portfolios.Remove(portfolio);
             await _context.SaveChangesAsync();
             return portfolio;
         }
