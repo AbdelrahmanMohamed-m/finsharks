@@ -30,6 +30,5 @@ namespace api.Models
 
         public List<Portfolio> Portfolios { get; set; } = [];
 
-
     }
 }
