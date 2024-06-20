@@ -38,40 +38,15 @@ namespace api.Repositories
             return await _context.stocks.AnyAsync(stock => stock.Id == id);
         }
 
-        public async Task<List<Stock>> Getall(QueryObject query)
-        {
-            var Stocks = _context.stocks.Include(stock => stock.Comments).ThenInclude(comment => comment.AppUser).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(query.Symbol))
-            {
-                Stocks = Stocks.Where(stock => stock.Symbol.Contains(query.Symbol));
-            }
-            if (!string.IsNullOrWhiteSpace(query.CompanyName))
-            {
-                Stocks = Stocks.Where(stock => stock.CompanyName.Contains(query.CompanyName));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Symbol))
-            {
-                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
-                {
-                    Stocks = query.IsDesending ? Stocks.OrderByDescending(stock => stock.Symbol) : Stocks.OrderBy(stock => stock.Symbol);
-                }
-            }
-
-            var skipNumber = (query.PageNumber - 1) * query.PageSize;
-            Stocks = Stocks.Skip(skipNumber).Take(query.PageSize);
-
-            return await Stocks.ToListAsync();
-        }
 
         public async Task<Stock?> GetbyId(int id)
         {
             return await _context.stocks.Include(c => c.Comments).FirstOrDefaultAsync(stock => stock.Id == id);
         }
 
-        public Task<Stock?> GetbySymbol(string Symbol)
-        { 
-             return _context.stocks.FirstOrDefaultAsync(stock => stock.Symbol == Symbol);
+        public async Task<Stock?> GetbySymbol(string Symbol)
+        {
+            return await _context.stocks.FirstOrDefaultAsync(stock => stock.Symbol == Symbol);
         }
 
         public async Task<Stock?> Update(int id, StockUpdateRequestDto stock)
@@ -86,6 +61,37 @@ namespace api.Repositories
             updateStockModel.UpdateFromDto(stock);
             await _context.SaveChangesAsync();
             return updateStockModel;
+        }
+
+        public async Task<List<Stock>> Getall(QueryObject query)
+        {
+            var Stocks = _context.stocks.Include(stock => stock.Comments).ThenInclude(comment => comment.AppUser).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                Stocks = Stocks.Where(stock => stock.Symbol.Contains(query.Symbol));
+
+                if (!string.IsNullOrWhiteSpace(query.CompanyName))
+                {
+                    Stocks = Stocks.Where(stock => stock.CompanyName.Contains(query.CompanyName));
+                }
+
+                if (!string.IsNullOrWhiteSpace(query.Symbol))
+                {
+                    if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Stocks = query.IsDesending ? Stocks.OrderByDescending(stock => stock.Symbol) : Stocks.OrderBy(stock => stock.Symbol);
+                    }
+                }
+
+                var skipNumber = (query.PageNumber - 1) * query.PageSize;
+                Stocks = Stocks.Skip(skipNumber).Take(query.PageSize);
+
+                return await Stocks.ToListAsync();
+            }
+            else
+            {
+                return await Stocks.ToListAsync();
+            }
         }
     }
 }
